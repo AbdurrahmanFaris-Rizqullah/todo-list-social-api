@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { UserService } from "@/services/user.service";
+import { isValidEmail } from "@/types/auth";
 
 export async function POST(req: Request) {
   try {
@@ -10,11 +11,8 @@ export async function POST(req: Request) {
 
     // Check if sensitive data is in URL params
     const url = new URL(req.url);
-    if (url.searchParams.has('email') || url.searchParams.has('password')) {
-      return NextResponse.json(
-        { error: "Credentials should be sent in request body, not URL parameters" },
-        { status: 400 }
-      );
+    if (url.searchParams.has("email") || url.searchParams.has("password")) {
+      return NextResponse.json({ error: "Credentials should be sent in request body, not URL parameters" }, { status: 400 });
     }
 
     // Check Content-Type
@@ -40,6 +38,11 @@ export async function POST(req: Request) {
     // Validate required fields
     if (!data.email || !data.password) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
+    }
+
+    // Validate email format
+    if (!isValidEmail(data.email)) {
+      return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
     }
 
     const result = await UserService.register(data);
