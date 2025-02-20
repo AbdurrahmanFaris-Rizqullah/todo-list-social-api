@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     Post[]
+  teams     Team[]   @relation("TeamOwner")
+  teamMemberships TeamMember[]
+
+  @@map("users")
+}
+
+model Post {
+  id          String     @id @default(uuid())
+  content     String
+  mediaUrl    String?
+  scheduledAt DateTime?
+  status      PostStatus @default(DRAFT)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  
+  userId      String?
+  teamId      String?
+  user        User?      @relation(fields: [userId], references: [id])
+  team        Team?      @relation(fields: [teamId], references: [id])
+
+  @@map("posts")
+}
+
+model Team {
+  id        String   @id @default(uuid())
+  name      String
+  ownerId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owner     User     @relation("TeamOwner", fields: [ownerId], references: [id])
+  posts     Post[]
+  members   TeamMember[]
+
+  @@map("teams")
+}
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  teamId    String
+  userId    String
+  role      TeamRole @default(MEMBER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  team      Team     @relation(fields: [teamId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([teamId, userId])
+  @@map("team_members")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TeamRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum PostStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+  POSTED
+  SCHEDULED
+  PUBLISHED
+}
