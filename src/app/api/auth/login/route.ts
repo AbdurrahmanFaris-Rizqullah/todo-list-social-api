@@ -45,6 +45,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
     }
 
+    // Check if user exists
+    const userExists = await UserService.findByEmail(data.email);
+    if (!userExists) {
+      return NextResponse.json(
+        {
+          error: "Account not found. Please register first.",
+        },
+        { status: 404 }
+      );
+    }
+
     const result = await UserService.login(data);
     return NextResponse.json(result);
   } catch (error: any) {

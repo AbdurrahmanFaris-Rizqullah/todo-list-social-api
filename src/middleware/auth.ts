@@ -44,19 +44,16 @@ export async function authMiddleware(req: NextRequest) {
   requestHeaders.set("x-user-id", decoded.userId);
 
   // Continue with modified request
-  return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  const response = NextResponse.next();
+  response.headers.set("x-user-id", decoded.userId);
+  return response;
 }
 
 // Konfigurasi middleware untuk path yang akan diproteksi
 export const config = {
   matcher: [
-    "/api/posts/:path*",
     "/api/teams/:path*",
+    "/api/posts/:path*",
     "/api/users/:path*",
-    // Tambahkan path lain yang perlu autentikasi
   ],
 };

@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 // Add social media account
 export async function POST(req: Request, { params }: { params: { teamId: string } }) {
   try {
-    await getCurrentUser(); // Verify authenticated
+    await getCurrentUser(req); // Add req parameter
     const data = await req.json();
 
     // Validate required fields
@@ -26,7 +26,7 @@ export async function POST(req: Request, { params }: { params: { teamId: string 
 // Get team's social media accounts
 export async function GET(req: Request, { params }: { params: { teamId: string } }) {
   try {
-    await getCurrentUser(); // Verify authenticated
+    await getCurrentUser(req); // Add req parameter
     const accounts = await TeamService.getSocialAccounts(params.teamId);
     return NextResponse.json(accounts);
   } catch (error: any) {

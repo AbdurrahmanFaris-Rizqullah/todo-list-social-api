@@ -1,28 +1,40 @@
-import { headers } from "next/headers";
-import prisma from "./prisma";
+import prisma from "@/lib/prisma";
+import { verifyToken } from "@/lib/jwt";
 
-export async function getCurrentUser() {
-  const headersList = headers();
-  const userId = headersList.get("x-user-id");
+export async function getCurrentUser(request: Request) {
+  const authHeader = request.headers.get("authorization");
 
-  if (!userId) {
+  if (!authHeader?.startsWith("Bearer ")) {
+    throw new Error("Invalid authorization header");
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = verifyToken(token) as { userId: string };
+    const userId = decoded.userId;
+
+    if (!userId) {
+      throw new Error("Invalid token payload");
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+      },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user;
+  } catch (error) {
     throw new Error("Not authenticated");
   }
-
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      email: true,
-      role: true,
-    },
-  });
-
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  return user;
 }
 
 // Helper untuk cek role
