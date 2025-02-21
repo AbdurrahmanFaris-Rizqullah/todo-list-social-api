@@ -10,12 +10,7 @@ interface DecodedToken {
 }
 
 // Paths yang tidak perlu autentikasi
-const PUBLIC_PATHS = [
-  "/api/auth/login",
-  "/api/auth/register",
-  "/api/auth/refresh-token",
-  "/api/auth/oauth/callback",
-];
+const PUBLIC_PATHS = ["/api/auth/login", "/api/auth/register", "/api/auth/refresh-token", "/api/auth/oauth/callback"];
 
 export async function authMiddleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
@@ -51,9 +46,5 @@ export async function authMiddleware(req: NextRequest) {
 
 // Konfigurasi middleware untuk path yang akan diproteksi
 export const config = {
-  matcher: [
-    "/api/teams/:path*",
-    "/api/posts/:path*",
-    "/api/users/:path*",
-  ],
+  matcher: ["/api/teams/:path*", "/api/posts/:path*", "/api/users/:path*"],
 };

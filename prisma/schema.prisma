@@ -100,7 +100,6 @@ enum PostStatus {
   SCHEDULED
   PUBLISHED
 }
-
 enum Platform {
   INSTAGRAM
   FACEBOOK

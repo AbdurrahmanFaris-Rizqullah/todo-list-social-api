@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/jwt";
+import { AuthenticationError } from './errors';
 
 export async function getCurrentUser(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -33,7 +34,7 @@ export async function getCurrentUser(request: Request) {
 
     return user;
   } catch (error) {
-    throw new Error("Not authenticated");
+    throw new AuthenticationError();
   }
 }
 
