@@ -6,9 +6,9 @@ A Next.js-based API for managing social media posts and team collaborations.
 
 - [Setup](#setup)
 - [API Documentation](#api-documentation)
+  - [Auth API](#auth-api)
   - [Posts API](#posts-api)
   - [Teams API](#teams-api)
-  - [Auth API](#auth-api)
 
 ## Setup
 
@@ -64,6 +64,85 @@ pnpm dev
 The API will be available at [http://localhost:3000/api](http://localhost:3000/api)
 
 ## API Documentation
+
+### Auth API
+
+Secure authentication endpoints for user registration and login.
+
+#### Quick Start Guide
+
+1. Use `multipart/form-data` format for all requests
+2. Never send credentials in URL parameters
+3. Handle authentication tokens securely
+
+#### Available Endpoints
+
+##### 1. Register
+
+Create a new user account:
+
+```http
+POST /api/auth/register
+```
+
+Request Headers:
+
+- `Content-Type: multipart/form-data` (required)
+
+Form Fields:
+
+- `email` (required): Valid email address
+- `password` (required): User password
+
+Success Response (201 Created):
+
+```json
+{
+  "id": "user_123",
+  "email": "user@example.com"
+}
+```
+
+##### 2. Login
+
+Authenticate and get access token:
+
+```http
+POST /api/auth/login
+```
+
+Request Headers:
+
+- `Content-Type: multipart/form-data` (required)
+
+Form Fields:
+
+- `email` (required): Registered email address
+- `password` (required): User password
+
+Success Response:
+
+```json
+{
+  "token": "your_auth_token_here",
+  "user": {
+    "id": "user_123",
+    "email": "user@example.com"
+  }
+}
+```
+
+#### Error Handling
+
+| Code | Meaning      | Common Causes                  |
+| ---- | ------------ | ------------------------------ |
+| 400  | Bad Request  | Invalid format, missing fields |
+| 401  | Unauthorized | Wrong credentials              |
+| 404  | Not Found    | Account doesn't exist          |
+| 405  | Not Allowed  | Wrong HTTP method              |
+| 500  | Server Error | Internal system error          |
+
+> 📝 For more detailed documentation, check out [docs/api/auth.md](docs/api/auth.md)
 
 ### Posts API
 
@@ -307,82 +386,3 @@ Success Response:
 | 500  | Server Error | Internal system error          |
 
 > 📝 For more detailed documentation, check out [docs/api/teams.md](docs/api/teams.md)
-
-### Auth API
-
-Secure authentication endpoints for user registration and login.
-
-#### Quick Start Guide
-
-1. Use `multipart/form-data` format for all requests
-2. Never send credentials in URL parameters
-3. Handle authentication tokens securely
-
-#### Available Endpoints
-
-##### 1. Register
-
-Create a new user account:
-
-```http
-POST /api/auth/register
-```
-
-Request Headers:
-
-- `Content-Type: multipart/form-data` (required)
-
-Form Fields:
-
-- `email` (required): Valid email address
-- `password` (required): User password
-
-Success Response (201 Created):
-
-```json
-{
-  "id": "user_123",
-  "email": "user@example.com"
-}
-```
-
-##### 2. Login
-
-Authenticate and get access token:
-
-```http
-POST /api/auth/login
-```
-
-Request Headers:
-
-- `Content-Type: multipart/form-data` (required)
-
-Form Fields:
-
-- `email` (required): Registered email address
-- `password` (required): User password
-
-Success Response:
-
-```json
-{
-  "token": "your_auth_token_here",
-  "user": {
-    "id": "user_123",
-    "email": "user@example.com"
-  }
-}
-```
-
-#### Error Handling
-
-| Code | Meaning      | Common Causes                  |
-| ---- | ------------ | ------------------------------ |
-| 400  | Bad Request  | Invalid format, missing fields |
-| 401  | Unauthorized | Wrong credentials              |
-| 404  | Not Found    | Account doesn't exist          |
-| 405  | Not Allowed  | Wrong HTTP method              |
-| 500  | Server Error | Internal system error          |
-
-> 📝 For more detailed documentation, check out [docs/api/auth.md](docs/api/auth.md)
