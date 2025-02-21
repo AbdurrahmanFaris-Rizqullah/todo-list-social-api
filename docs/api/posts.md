@@ -2,12 +2,16 @@
 
 ## What is Posts API?
 
-Posts API allows you to manage social media posts in the application. You can update existing posts, schedule posts, and manage post content.
+Posts API allows you to manage social media posts in the application. You can create, read, update, and delete posts, with optional team context and media attachments.
 
 ## Table of Contents
 
 - [Getting Started](#getting-started)
 - [Managing Posts](#managing-posts)
+  - [Create Post](#1-create-post)
+  - [Get Posts](#2-get-posts)
+  - [Update Post](#3-update-post)
+  - [Delete Post](#4-delete-post)
 - [Handling Errors](#handling-errors)
 - [Code Examples](#code-examples)
 
@@ -21,7 +25,114 @@ Before using the API, make sure you have:
 
 ## Managing Posts
 
-### 1. Update Post
+### 1. Create Post
+
+Create a new post with optional media and scheduling:
+
+```http
+POST /api/posts
+```
+
+Supports both JSON and multipart/form-data formats.
+
+#### Using JSON
+
+Request Headers:
+
+```
+Content-Type: application/json
+Authorization: Bearer <your_token>
+```
+
+Request Body:
+
+```json
+{
+  "content": "Your post content here",
+  "teamId": "team_123", // Optional: Post in team context
+  "mediaUrl": "https://example.com/image.jpg", // Optional
+  "scheduledAt": "2024-03-20T10:00:00Z" // Optional
+}
+```
+
+#### Using Form Data
+
+Request Headers:
+
+```
+Content-Type: multipart/form-data
+Authorization: Bearer <your_token>
+```
+
+Form Fields:
+
+- `content` (required): Post content text
+- `teamId` (optional): Team ID
+- `mediaUrl` (optional): Media URL
+- `scheduledAt` (optional): Schedule time
+
+Success Response (201 Created):
+
+```json
+{
+  "id": "post_123",
+  "content": "Your post content here",
+  "mediaUrl": "https://example.com/image.jpg",
+  "scheduledAt": "2024-03-20T10:00:00Z",
+  "teamId": "team_123",
+  "createdAt": "2024-03-19T10:00:00Z",
+  "updatedAt": "2024-03-19T10:00:00Z"
+}
+```
+
+### 2. Get Posts
+
+Retrieve posts with optional filters:
+
+```http
+GET /api/posts
+```
+
+Request Headers:
+
+```
+Authorization: Bearer <your_token>
+```
+
+Query Parameters:
+
+- `teamId` (optional): Filter posts by team
+- `status` (optional): Filter by post status
+
+Example:
+
+```
+GET /api/posts?teamId=team_123&status=PUBLISHED
+```
+
+Success Response:
+
+```json
+[
+  {
+    "id": "post_123",
+    "content": "First post",
+    "mediaUrl": "https://example.com/image1.jpg",
+    "teamId": "team_123",
+    "status": "PUBLISHED",
+    "createdAt": "2024-03-19T10:00:00Z"
+  },
+  {
+    "id": "post_124",
+    "content": "Second post",
+    "teamId": "team_123",
+    "status": "PUBLISHED",
+    "createdAt": "2024-03-19T11:00:00Z"
+  }
+]
+```
+
+### 3. Update Post
 
 Use this endpoint to modify an existing post:
 
@@ -60,7 +171,7 @@ Success response:
 }
 ```
 
-### 2. Delete Post
+### 4. Delete Post
 
 Remove a post permanently:
 

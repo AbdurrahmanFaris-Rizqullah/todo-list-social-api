@@ -8,6 +8,7 @@ A Next.js-based API for managing social media posts and team collaborations.
 - [API Documentation](#api-documentation)
   - [Posts API](#posts-api)
   - [Teams API](#teams-api)
+  - [Auth API](#auth-api)
 
 ## Setup
 
@@ -87,7 +88,43 @@ Authorization: Bearer <your_token>
 
 #### Available Endpoints
 
-##### 1. Update Post
+##### 1. Create Post
+
+Create a new post with optional media and scheduling:
+
+```http
+POST /api/posts
+```
+
+Request Headers:
+
+- `Content-Type: application/json` (or multipart/form-data)
+- `Authorization: Bearer <token>` (required)
+
+Request Body (JSON):
+
+```json
+{
+  "content": "Your post content here",
+  "teamId": "team_123", // Optional
+  "mediaUrl": "https://example.com/image.jpg", // Optional
+  "scheduledAt": "2024-03-20T10:00:00Z" // Optional
+}
+```
+
+##### 2. Get Posts
+
+Retrieve posts with optional filters:
+
+```http
+GET /api/posts?teamId=team_123&status=PUBLISHED
+```
+
+Request Headers:
+
+- `Authorization: Bearer <token>` (required)
+
+##### 3. Update Post
 
 Modify an existing post's content, media, or schedule:
 
@@ -123,7 +160,7 @@ Success Response:
 }
 ```
 
-##### 2. Delete Post
+##### 4. Delete Post
 
 Remove a post permanently:
 
@@ -270,3 +307,82 @@ Success Response:
 | 500  | Server Error | Internal system error          |
 
 > 📝 For more detailed documentation, check out [docs/api/teams.md](docs/api/teams.md)
+
+### Auth API
+
+Secure authentication endpoints for user registration and login.
+
+#### Quick Start Guide
+
+1. Use `multipart/form-data` format for all requests
+2. Never send credentials in URL parameters
+3. Handle authentication tokens securely
+
+#### Available Endpoints
+
+##### 1. Register
+
+Create a new user account:
+
+```http
+POST /api/auth/register
+```
+
+Request Headers:
+
+- `Content-Type: multipart/form-data` (required)
+
+Form Fields:
+
+- `email` (required): Valid email address
+- `password` (required): User password
+
+Success Response (201 Created):
+
+```json
+{
+  "id": "user_123",
+  "email": "user@example.com"
+}
+```
+
+##### 2. Login
+
+Authenticate and get access token:
+
+```http
+POST /api/auth/login
+```
+
+Request Headers:
+
+- `Content-Type: multipart/form-data` (required)
+
+Form Fields:
+
+- `email` (required): Registered email address
+- `password` (required): User password
+
+Success Response:
+
+```json
+{
+  "token": "your_auth_token_here",
+  "user": {
+    "id": "user_123",
+    "email": "user@example.com"
+  }
+}
+```
+
+#### Error Handling
+
+| Code | Meaning      | Common Causes                  |
+| ---- | ------------ | ------------------------------ |
+| 400  | Bad Request  | Invalid format, missing fields |
+| 401  | Unauthorized | Wrong credentials              |
+| 404  | Not Found    | Account doesn't exist          |
+| 405  | Not Allowed  | Wrong HTTP method              |
+| 500  | Server Error | Internal system error          |
+
+> 📝 For more detailed documentation, check out [docs/api/auth.md](docs/api/auth.md)
