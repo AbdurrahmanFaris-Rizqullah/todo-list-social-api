@@ -1,10 +1,56 @@
-# CRUD API for to-do list management posts on social media
+# CRUD API for Social Media Post Management
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+A Next.js-based API for managing social media posts and team collaborations.
 
-## Getting Started
+## Table of Contents
 
-First, run the development server:
+- [Setup](#setup)
+- [API Documentation](#api-documentation)
+  - [Posts API](#posts-api)
+  - [Teams API](#teams-api)
+
+## Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/AbdurrahmanFaris-Rizqullah/todo-list-social-api.git
+cd todo-list-social-api
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install / npm i
+# or
+yarn install
+# or
+pnpm install
+```
+
+### 3. Environment Setup
+
+Create a `.env` file in the root directory:
+
+```env
+# Database
+DATABASE_URL="your_database_url"
+
+# Authentication
+JWT_SECRET="your_jwt_secret"
+
+# Optional: External Services
+MEDIA_STORAGE_URL="your_media_storage_url" # If using media uploads
+```
+
+### 4. Database Setup
+
+```bash
+# Run migrations
+npx prisma migrate dev
+```
+
+### 5. Start Development Server
 
 ```bash
 npm run dev
@@ -12,17 +58,15 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The API will be available at [http://localhost:3000/api](http://localhost:3000/api)
 
 ## API Documentation
 
 ### Posts API
 
-The Posts API allows you to manage posts in the application. You can perform operations like updating and deleting posts.
+Manage your social media posts with our Posts API.
 
 #### Quick Start Guide
 
@@ -33,7 +77,7 @@ The Posts API allows you to manage posts in the application. You can perform ope
 
 #### Authentication
 
-All API endpoints are protected and require authentication. You must include your authentication token in the request headers:
+All API endpoints require authentication. Include your token in request headers:
 
 ```
 Authorization: Bearer <your_token>
@@ -45,7 +89,7 @@ Authorization: Bearer <your_token>
 
 ##### 1. Update Post
 
-Use this endpoint to modify an existing post's content, media, or schedule.
+Modify an existing post's content, media, or schedule:
 
 ```http
 PUT /api/posts/{postId}
@@ -81,7 +125,7 @@ Success Response:
 
 ##### 2. Delete Post
 
-Remove a post permanently from the system.
+Remove a post permanently:
 
 ```http
 DELETE /api/posts/{postId}
@@ -103,64 +147,126 @@ Success Response:
 
 The API uses standard HTTP status codes and returns detailed error messages:
 
-| Status | Meaning      | Common Causes                         |
-| ------ | ------------ | ------------------------------------- |
-| 400    | Bad Request  | Invalid JSON, missing required fields |
-| 401    | Unauthorized | Missing or invalid token              |
-| 403    | Forbidden    | Not allowed to modify this post       |
-| 404    | Not Found    | Post doesn't exist                    |
-| 500    | Server Error | Internal system error                 |
-
-#### Code Examples
-
-1. Update a post using cURL:
-
-```bash
-curl -X PUT \
-  http://localhost:3000/api/posts/123 \
-  -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer your_token' \
-  -d '{
-    "content": "Updated content",
-    "mediaUrl": "https://example.com/new-image.jpg"
-  }'
-```
-
-2. Delete a post using cURL:
-
-```bash
-curl -X DELETE \
-  http://localhost:3000/api/posts/123 \
-  -H 'Authorization: Bearer your_token'
-```
-
-3. Update a post using JavaScript fetch:
-
-```javascript
-const updatePost = async (postId, content) => {
-  const response = await fetch(`/api/posts/${postId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer your_token",
-    },
-    body: JSON.stringify({ content }),
-  });
-  return await response.json();
-};
-```
+| Code | Meaning      | Common Causes                         |
+| ---- | ------------ | ------------------------------------- |
+| 400  | Bad Request  | Invalid JSON, missing required fields |
+| 401  | Unauthorized | Missing or invalid token              |
+| 403  | Forbidden    | Not allowed to modify this post       |
+| 404  | Not Found    | Post doesn't exist                    |
+| 500  | Server Error | Internal system error                 |
 
 > 📝 For more detailed documentation, check out [docs/api/posts.md](docs/api/posts.md)
 
-## Learn More
+### Teams API
 
-To learn more about Next.js, take a look at the following resources:
+Collaborate with team members using our Teams API.
 
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Learn Next.js](https://nextjs.org/learn)
+#### Quick Start Guide
 
-## Deploy on Vercel
+1. Create a team
+2. Add members to your team
+3. Manage team posts and permissions
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
+#### Available Endpoints
 
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+##### 1. Create Team
+
+Create a new team:
+
+```http
+POST /api/teams
+```
+
+Request Headers:
+
+- `Content-Type: application/json` (required)
+- `Authorization: Bearer <token>` (required)
+
+Request Body:
+
+```json
+{
+  "name": "My Awesome Team",
+  "description": "Team description here"
+}
+```
+
+Success Response:
+
+```json
+{
+  "id": "team_123",
+  "name": "My Awesome Team",
+  "description": "Team description here",
+  "createdAt": "2024-03-19T10:00:00Z",
+  "ownerId": "user_123"
+}
+```
+
+##### 2. Add Team Member
+
+Add a user to your team:
+
+```http
+POST /api/teams/{teamId}/members
+```
+
+Request Headers:
+
+- `Content-Type: application/json` (required)
+- `Authorization: Bearer <token>` (required)
+
+Request Body:
+
+```json
+{
+  "userId": "user_456",
+  "role": "MEMBER" // or "ADMIN"
+}
+```
+
+Success Response:
+
+```json
+{
+  "message": "Member added successfully",
+  "teamMember": {
+    "userId": "user_456",
+    "teamId": "team_123",
+    "role": "MEMBER",
+    "joinedAt": "2024-03-19T10:00:00Z"
+  }
+}
+```
+
+##### 3. Remove Team Member
+
+Remove a member from your team:
+
+```http
+DELETE /api/teams/{teamId}/members/{userId}
+```
+
+Request Headers:
+
+- `Authorization: Bearer <token>` (required)
+
+Success Response:
+
+```json
+{
+  "message": "Member removed successfully"
+}
+```
+
+#### Error Handling
+
+| Code | Meaning      | Common Causes                  |
+| ---- | ------------ | ------------------------------ |
+| 400  | Bad Request  | Invalid role, duplicate member |
+| 401  | Unauthorized | Missing or invalid token       |
+| 403  | Forbidden    | Not authorized to manage team  |
+| 404  | Not Found    | Team or user not found         |
+| 500  | Server Error | Internal system error          |
+
+> 📝 For more detailed documentation, check out [docs/api/teams.md](docs/api/teams.md)
