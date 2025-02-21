@@ -1,0 +1,370 @@
+openapi: 3.0.0
+info:
+  title: Social Media Post Management API
+  description: API for managing social media posts, teams, and authentication
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: user_123
+        email:
+          type: string
+          format: email
+          example: user@example.com
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+          example: post_123
+        content:
+          type: string
+          example: Your post content here
+        mediaUrl:
+          type: string
+          example: https://example.com/image.jpg
+        scheduledAt:
+          type: string
+          format: date-time
+        teamId:
+          type: string
+          example: team_123
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Team:
+      type: object
+      properties:
+        id:
+          type: string
+          example: team_123
+        name:
+          type: string
+          example: My Awesome Team
+        description:
+          type: string
+          example: Team description here
+        ownerId:
+          type: string
+          example: user_123
+        createdAt:
+          type: string
+          format: date-time
+
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        "201":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid input
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  user:
+                    $ref: "#/components/schemas/User"
+        "401":
+          description: Invalid credentials
+
+  /posts:
+    get:
+      tags: [Posts]
+      summary: Get all posts
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: teamId
+          schema:
+            type: string
+          description: Filter by team ID
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [DRAFT, PUBLISHED, SCHEDULED]
+      responses:
+        "200":
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+
+    post:
+      tags: [Posts]
+      summary: Create new post
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+                teamId:
+                  type: string
+                mediaUrl:
+                  type: string
+                scheduledAt:
+                  type: string
+                  format: date-time
+      responses:
+        "201":
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+
+  /posts/{postId}:
+    parameters:
+      - in: path
+        name: postId
+        required: true
+        schema:
+          type: string
+
+    put:
+      tags: [Posts]
+      summary: Update post
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                mediaUrl:
+                  type: string
+                scheduledAt:
+                  type: string
+                  format: date-time
+      responses:
+        "200":
+          description: Post updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+
+    delete:
+      tags: [Posts]
+      summary: Delete post
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Post deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Post deleted successfully
+
+  /teams:
+    get:
+      tags: [Teams]
+      summary: Get user's teams
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: List of teams
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Team"
+
+    post:
+      tags: [Teams]
+      summary: Create new team
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        "200":
+          description: Team created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+
+  /teams/{teamId}/members:
+    post:
+      tags: [Teams]
+      summary: Add team member
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: teamId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - role
+              properties:
+                userId:
+                  type: string
+                role:
+                  type: string
+                  enum: [MEMBER, ADMIN]
+      responses:
+        "201":
+          description: Member added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  teamMember:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+                      teamId:
+                        type: string
+                      role:
+                        type: string
+                      joinedAt:
+                        type: string
+                        format: date-time
+
+  /teams/{teamId}/members/{userId}:
+    delete:
+      tags: [Teams]
+      summary: Remove team member
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: teamId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Member removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Member removed successfully
