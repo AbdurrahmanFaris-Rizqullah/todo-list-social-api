@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { CreateTeamDTO, AddMemberDTO } from "@/types/team";
+import { CreateTeamDTO, AddMemberDTO, SocialAccountDTO } from "@/types/team";
 
 export class TeamService {
   static async createTeam(userId: string, data: CreateTeamDTO) {
@@ -73,6 +73,33 @@ export class TeamService {
       where: {
         teamId: teamId,
         userId: userId,
+      },
+    });
+  }
+
+  static async addSocialAccount(teamId: string, data: SocialAccountDTO) {
+    return await prisma.socialMedia.create({
+      data: {
+        platform: data.platform,
+        username: data.username,
+        token: data.token,
+        teamId: teamId,
+      },
+    });
+  }
+
+  static async getSocialAccounts(teamId: string) {
+    return await prisma.socialMedia.findMany({
+      where: {
+        teamId: teamId,
+      },
+      select: {
+        id: true,
+        platform: true,
+        username: true,
+        teamId: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
   }

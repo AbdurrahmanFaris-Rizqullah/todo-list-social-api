@@ -47,6 +47,7 @@ model Team {
   owner     User     @relation("TeamOwner", fields: [ownerId], references: [id])
   posts     Post[]
   members   TeamMember[]
+  socialMedia SocialMedia[]
 
   @@map("teams")
 }
@@ -63,6 +64,19 @@ model TeamMember {
 
   @@unique([teamId, userId])
   @@map("team_members")
+}
+
+model SocialMedia {
+  id        String   @id @default(uuid())
+  platform  Platform
+  username  String
+  token     String
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("social_accounts")
 }
 
 enum Role {
@@ -85,4 +99,11 @@ enum PostStatus {
   POSTED
   SCHEDULED
   PUBLISHED
+}
+
+enum Platform {
+  INSTAGRAM
+  FACEBOOK
+  TWITTER
+  LINKEDIN
 }

@@ -23,3 +23,18 @@ export interface TeamMemberResponse {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface SocialAccountDTO {
+  platform: "INSTAGRAM" | "FACEBOOK" | "TWITTER" | "LINKEDIN";
+  username: string;
+  token: string;
+}
+
+export interface SocialAccountResponse {
+  id: string;
+  platform: string;
+  username: string;
+  teamId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
