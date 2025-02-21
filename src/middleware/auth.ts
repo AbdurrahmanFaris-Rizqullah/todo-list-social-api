@@ -10,7 +10,12 @@ interface DecodedToken {
 }
 
 // Paths yang tidak perlu autentikasi
-const PUBLIC_PATHS = ["/api/auth/login", "/api/auth/register", "/api/auth/refresh-token"];
+const PUBLIC_PATHS = [
+  "/api/auth/login",
+  "/api/auth/register",
+  "/api/auth/refresh-token",
+  "/api/auth/oauth/callback",
+];
 
 export async function authMiddleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
