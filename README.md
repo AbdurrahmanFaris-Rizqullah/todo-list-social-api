@@ -1,4 +1,4 @@
-# Next.js Project with Posts API
+# CRUD API for to-do list management posts on social media
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
