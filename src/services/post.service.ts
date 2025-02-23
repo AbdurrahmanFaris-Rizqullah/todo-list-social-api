@@ -1,6 +1,8 @@
 import prisma from "@/lib/prisma";
 import { PostStatus } from "@prisma/client";
 import { ValidationError, AuthorizationError, NotFoundError, AppError } from "@/lib/errors";
+import { WorkflowService } from "./workflow.service";
+import { NotificationService } from "./notification.service";
 
 /**
  * Service class untuk mengelola Post/Todo
@@ -274,5 +276,26 @@ export class PostService {
     } catch (error) {
       throw new AppError("Failed to delete post", 500, "DATABASE_ERROR");
     }
+  }
+
+  static async submitForApproval(postId: string, userId: string) {
+    const post = await WorkflowService.submitForReview(postId, userId);
+    await NotificationService.sendNotification(
+      userId,
+      "Your post has been submitted for approval"
+    );
+    return post;
+  }
+
+  static async approvePost(postId: string, userId: string) {
+    const post = await WorkflowService.approvePost(postId, userId);
+    await NotificationService.notifyPostApproval(postId, true);
+    return post;
+  }
+
+  static async rejectPost(postId: string, userId: string) {
+    const post = await WorkflowService.rejectPost(postId, userId);
+    await NotificationService.notifyPostApproval(postId, false);
+    return post;
   }
 }
